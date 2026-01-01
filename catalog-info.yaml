@@ -1,0 +1,40 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: user-service
+  title: User Management Service
+  description: User profiles, preferences, and management service for Conga Platform
+  annotations:
+    github.com/project-slug: testorg08/user-service
+    argocd/app-selector: app.kubernetes.io/name=user-service
+    backstage.io/techdocs-ref: dir:.
+    conga.io/site-group: CSG1
+    conga.io/sync-wave: "2"
+    conga.io/database-dependencies: user_database
+    conga.io/infrastructure-requirements: postgresql,redis,s3
+  tags:
+    - users
+    - profiles
+    - management
+    - platform
+    - csg1
+  links:
+    - url: https://users-dev.conga.com
+      title: Development Environment
+      icon: web
+    - url: https://users-staging.conga.com
+      title: Staging Environment
+      icon: web
+    - url: https://users.conga.com
+      title: Production Environment
+      icon: web
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+  system: conga-platform-core
+  providesApis:
+    - user-api
+  dependsOn:
+    - component:auth-service
+    - component:config-service
