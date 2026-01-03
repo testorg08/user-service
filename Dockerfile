@@ -7,7 +7,7 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies (use npm install instead of npm ci for compatibility)
 RUN npm install --only=production
 
 # Copy source code
@@ -21,7 +21,7 @@ RUN addgroup -g 1001 -S nodejs && \
 RUN chown -R nodejs:nodejs /app
 USER nodejs
 
-# Expose port
+# Expose port 3000 (not 8080)
 EXPOSE 3000
 
 # Health check
