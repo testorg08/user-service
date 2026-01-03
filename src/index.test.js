@@ -1,62 +1,11 @@
 const request = require('supertest');
-const express = require('express');
+const createApp = require('./index');
 
-// Import the app logic (we'll need to refactor index.js to export the app)
 describe('User Service', () => {
   let app;
 
   beforeEach(() => {
-    // Create a new app instance for each test
-    app = express();
-    app.use(express.json());
-
-    // Health check endpoints
-    app.get('/health', (req, res) => {
-      res.status(200).json({ 
-        status: 'healthy', 
-        service: 'user-service',
-        timestamp: new Date().toISOString(),
-        version: process.env.npm_package_version || '1.0.0'
-      });
-    });
-
-    app.get('/ready', (req, res) => {
-      res.status(200).json({ 
-        status: 'ready', 
-        service: 'user-service',
-        timestamp: new Date().toISOString()
-      });
-    });
-
-    // API endpoints
-    app.get('/api/users', (req, res) => {
-      res.json({
-        users: [
-          { id: 1, name: 'John Doe', email: 'john@example.com', role: 'admin' },
-          { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'user' },
-          { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'user' }
-        ],
-        total: 3,
-        service: 'user-service'
-      });
-    });
-
-    // Root endpoint
-    app.get('/', (req, res) => {
-      res.json({
-        service: 'user-service',
-        version: '1.0.0',
-        description: 'User management service for Conga Platform',
-        endpoints: [
-          'GET /health - Health check',
-          'GET /ready - Readiness check',
-          'GET /api/users - List all users',
-          'GET /api/users/:id - Get user by ID',
-          'POST /api/users - Create new user'
-        ],
-        environment: process.env.NODE_ENV || 'development'
-      });
-    });
+    app = createApp();
   });
 
   describe('Health Endpoints', () => {
@@ -78,18 +27,6 @@ describe('User Service', () => {
     });
   });
 
-  describe('API Endpoints', () => {
-    test('GET /api/users should return users list', async () => {
-      const response = await request(app).get('/api/users');
-      
-      expect(response.status).toBe(200);
-      expect(response.body.users).toBeDefined();
-      expect(Array.isArray(response.body.users)).toBe(true);
-      expect(response.body.total).toBe(3);
-      expect(response.body.service).toBe('user-service');
-    });
-  });
-
   describe('Root Endpoint', () => {
     test('GET / should return service information', async () => {
       const response = await request(app).get('/');
@@ -99,6 +36,75 @@ describe('User Service', () => {
       expect(response.body.version).toBe('1.0.0');
       expect(response.body.description).toContain('User management');
       expect(Array.isArray(response.body.endpoints)).toBe(true);
+    });
+  });
+
+  describe('User API Endpoints', () => {
+    test('GET /api/users should return list of users', async () => {
+      const response = await request(app).get('/api/users');
+      
+      expect(response.status).toBe(200);
+      expect(response.body.users).toBeDefined();
+      expect(Array.isArray(response.body.users)).toBe(true);
+      expect(response.body.total).toBe(3);
+      expect(response.body.service).toBe('user-service');
+    });
+
+    test('GET /api/users/:id should return specific user', async () => {
+      const response = await request(app).get('/api/users/1');
+      
+      expect(response.status).toBe(200);
+      expect(response.body.id).toBe(1);
+      expect(response.body.name).toBe('John Doe');
+      expect(response.body.email).toBe('john@example.com');
+    });
+
+    test('GET /api/users/:id should return 404 for non-existent user', async () => {
+      const response = await request(app).get('/api/users/999');
+      
+      expect(response.status).toBe(404);
+      expect(response.body.error).toBe('User not found');
+    });
+
+    test('POST /api/users should create new user', async () => {
+      const newUser = {
+        name: 'Test User',
+        email: 'test@example.com',
+        role: 'user'
+      };
+
+      const response = await request(app)
+        .post('/api/users')
+        .send(newUser);
+      
+      expect(response.status).toBe(201);
+      expect(response.body.name).toBe(newUser.name);
+      expect(response.body.email).toBe(newUser.email);
+      expect(response.body.role).toBe(newUser.role);
+      expect(response.body.id).toBeDefined();
+    });
+
+    test('POST /api/users should default role to user', async () => {
+      const newUser = {
+        name: 'Test User',
+        email: 'test@example.com'
+      };
+
+      const response = await request(app)
+        .post('/api/users')
+        .send(newUser);
+      
+      expect(response.status).toBe(201);
+      expect(response.body.role).toBe('user');
+    });
+  });
+
+  describe('Error Handling', () => {
+    test('GET /nonexistent should return 404', async () => {
+      const response = await request(app).get('/nonexistent');
+      
+      expect(response.status).toBe(404);
+      expect(response.body.error).toBe('Endpoint not found');
     });
   });
 });
