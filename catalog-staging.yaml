@@ -1,0 +1,22 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: user-service-staging
+  title: User Management Service (Staging)
+  description: Staging environment for user management service
+  annotations:
+    github.com/project-slug: testorg08/user-service
+    argocd/app-name: user-service-staging
+    backstage.io/techdocs-ref: dir:.
+    backstage.io/kubernetes-id: user-service
+    backstage.io/kubernetes-namespace: csg1-staging
+    backstage.io/kubernetes-label-selector: 'app.kubernetes.io/name=user-service'
+  tags:
+    - users
+    - staging
+    - csg1
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+  system: conga-platform-core

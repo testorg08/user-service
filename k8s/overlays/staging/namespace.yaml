@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: csg1-staging
+  labels:
+    conga.io/environment: staging
+    conga.io/site-group: CSG1

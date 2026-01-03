@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  labels:
+    app.kubernetes.io/name: user-service
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: conga-platform
+    conga.io/site-group: CSG1
+    conga.io/sync-wave: "2"
+  annotations:
+    conga.io/sync-wave: "2"
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app.kubernetes.io/name: user-service

@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: user-service-staging
+  namespace: argocd
+  labels:
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/name: user-service
+    app.kubernetes.io/part-of: conga-platform
+    conga.io/environment: staging
+    conga.io/site-group: CSG1
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/testorg08/user-service
+    targetRevision: main
+    path: k8s/overlays/staging
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: csg1-staging
+  syncPolicy:
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+    syncOptions:
+      - CreateNamespace=true
+  info:
+    - name: 'Site Group'
+      value: 'CSG1'
+    - name: 'Sync Wave'
+      value: '2'
+    - name: 'Environment'
+      value: 'Staging'
+    - name: 'Owner'
+      value: 'Platform Team'

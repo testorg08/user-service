@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: csg1-dev
+  labels:
+    conga.io/environment: dev
+    conga.io/site-group: CSG1
