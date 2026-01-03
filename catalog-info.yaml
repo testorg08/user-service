@@ -8,12 +8,10 @@ metadata:
     github.com/project-slug: testorg08/user-service
     argocd/app-name: user-service-dev
     backstage.io/techdocs-ref: dir:.
-    conga.io/site-group: CSG1
-    conga.io/sync-wave: "2"
-    conga.io/database-dependencies: user_database
-    conga.io/infrastructure-requirements: postgresql,redis,s3
-    # CI/CD Integration
+    # Code Coverage Integration
+    backstage.io/code-coverage: enabled
     github.com/workflows: ci-cd.yaml
+    # Kubernetes Integration
     backstage.io/kubernetes-id: user-service
     backstage.io/kubernetes-namespace: csg1-dev,csg1-staging
     backstage.io/kubernetes-label-selector: 'app.kubernetes.io/name=user-service'
